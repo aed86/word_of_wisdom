@@ -1,26 +1,38 @@
 package main
 
 import (
-	"log"
-	"net/http"
-
-	"github.com/aed86/proof_of_work/internal/server/handlers"
-	"github.com/gorilla/mux"
+	"github.com/aed86/proof_of_work/internal/server/handlers/get_challenge"
+	"github.com/aed86/proof_of_work/internal/server/handlers/get_quote"
+	"github.com/aed86/proof_of_work/internal/server/pkg/challenger/usecase"
+	quoter_usecase "github.com/aed86/proof_of_work/internal/server/pkg/quoter/usecase"
+	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
-	r := mux.NewRouter()
+	// Echo instance
+	e := echo.New()
 
-	r.HandleFunc("/get_challenge", handlers.GetChallenge).Methods("GET")
-	r.HandleFunc("/get_quote", handlers.GetQuote).Methods("GET")
+	// Middleware
+	e.Use(middleware.Logger())
+	e.Use(middleware.Recover())
 
-	srv := &http.Server{
-		Addr:    ":8000",
-		Handler: r,
-	}
+	challengerUsecase := usecase.NewChallenger()
+	quoterUsecase := quoter_usecase.NewQuoter()
 
-	err := srv.ListenAndServe()
-	if err != nil {
-		log.Fatal(err)
-	}
+	getChallengerHandler := get_challenge.NewHandler(challengerUsecase)
+	getQuoteHandler := get_quote.NewHandler(
+		challengerUsecase,
+		quoterUsecase,
+	)
+	//errorHandler := error2.NewHandler()
+
+	// Routes
+	e.GET("/getChallenge", getChallengerHandler.GetChallenge)
+	e.GET("/getQuote", getQuoteHandler.GetQuote)
+
+	//e.HTTPErrorHandler = errorHandler.Handler
+
+	// Start server
+	e.Logger.Fatal(e.Start(":8000"))
 }
