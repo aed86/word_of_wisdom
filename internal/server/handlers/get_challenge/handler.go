@@ -3,7 +3,7 @@ package get_challenge
 import (
 	"net/http"
 
-	"github.com/aed86/proof_of_work/internal/server/pkg/challenger"
+	"github.com/aed86/proof_of_work/internal/pkg/challenger"
 	"github.com/labstack/echo/v4"
 )
 

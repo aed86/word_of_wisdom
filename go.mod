@@ -5,6 +5,7 @@ go 1.17
 require github.com/labstack/echo/v4 v4.7.0
 
 require (
+	github.com/bwesterb/go-pow v1.0.0 // indirect
 	github.com/gocarina/gocsv v0.0.0-20220310154401-d4df709ca055 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/labstack/gommon v0.3.1 // indirect
