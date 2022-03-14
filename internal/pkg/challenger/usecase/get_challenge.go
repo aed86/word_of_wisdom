@@ -9,7 +9,7 @@ import (
 )
 
 func (c *challenger) GetChallenge() (*model.Challenge, error) {
-	challengeData := make([]byte, 16)
+	challengeData := make([]byte, 32)
 	_, err := rand.Read(challengeData)
 	if err != nil {
 		return nil, err

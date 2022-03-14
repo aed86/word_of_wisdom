@@ -1,3 +1,3 @@
 package challenger
 
-const LeadingZerosCount = 1
+const LeadingZerosCount = 2

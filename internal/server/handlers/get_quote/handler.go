@@ -15,17 +15,20 @@ type handler struct {
 	challenger       challenger.Usecase
 	quoter           quoter.Usecase
 	powHeaderBuilder pow_header_builder.Usecase
+	logger           echo.Logger
 }
 
 func NewHandler(
 	challenger challenger.Usecase,
 	quoter quoter.Usecase,
 	powHeaderBuilder pow_header_builder.Usecase,
+	logger echo.Logger,
 ) *handler {
 	return &handler{
 		challenger:       challenger,
 		quoter:           quoter,
 		powHeaderBuilder: powHeaderBuilder,
+		logger:           logger,
 	}
 }
 
@@ -35,14 +38,18 @@ func (h *handler) GetQuote(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusForbidden, fmt.Sprintf("'%s' header is required", internal.PowHeaderName))
 	}
 
+	h.logger.Debug("Pow-Header: ", powHash)
+
 	solution, err := h.powHeaderBuilder.Extract(powHash)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusBadRequest)
+		return echo.NewHTTPError(http.StatusBadRequest, err)
 	}
+
+	h.logger.Debug("Nonce: ", solution.Nonce)
 
 	err = h.challenger.Validate(*solution)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusForbidden, "Challenge not solved")
+		return echo.NewHTTPError(http.StatusForbidden, "Challenge not solved", err)
 	}
 
 	quote, err := h.quoter.GetQuote()

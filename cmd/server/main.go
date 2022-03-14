@@ -19,7 +19,7 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	challengerUsecase := usecase.NewChallenger()
+	challengerUsecase := usecase.NewChallenger(e.Logger)
 	quoterUsecase := quoter_usecase.NewQuoter()
 	powHeaderBuilderUsecase := pow_header_builder_usecase.NewPowHeaderBuilder()
 
@@ -28,6 +28,7 @@ func main() {
 		challengerUsecase,
 		quoterUsecase,
 		powHeaderBuilderUsecase,
+		e.Logger,
 	)
 
 	// Routes

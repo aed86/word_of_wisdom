@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"encoding/base64"
 	"fmt"
 	"strconv"
 	"strings"
@@ -14,19 +15,30 @@ func (*powHeaderBuilder) Extract(powHeader string) (*model.Solution, error) {
 		return nil, fmt.Errorf("wrong header format")
 	}
 
-	nonce, err := strconv.ParseInt(parts[2], 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
 	timestamp, err := strconv.ParseInt(parts[3], 10, 64)
 	if err != nil {
 		return nil, err
 	}
 
+	nonce, err := strconv.ParseInt(parts[1], 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
+	challenge, err := base64.StdEncoding.DecodeString(parts[0])
+	if err != nil {
+		return nil, err
+	}
+
+	leadingZeros, err := strconv.ParseInt(parts[3], 10, 64)
+	if err != nil {
+		return nil, err
+	}
+
 	return &model.Solution{
-		Challenge: []byte(parts[0]),
-		Nonce:     nonce,
-		Timestamp: timestamp,
+		Challenge:    challenge,
+		Nonce:        nonce,
+		LeadingZeros: int(leadingZeros),
+		Timestamp:    timestamp,
 	}, nil
 }

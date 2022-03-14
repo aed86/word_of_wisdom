@@ -1,42 +1,45 @@
 package main
 
 import (
-	"fmt"
+	"encoding/base64"
 	"log"
 
 	"github.com/aed86/proof_of_work/internal/client"
-	usecase2 "github.com/aed86/proof_of_work/internal/pkg/challenger/usecase"
+	challenger_usecase "github.com/aed86/proof_of_work/internal/pkg/challenger/usecase"
 	"github.com/aed86/proof_of_work/internal/pkg/pow_header_builder/usecase"
+	"github.com/labstack/echo/v4"
 )
 
 func main() {
-	fmt.Println("Started")
-	c := client.NewClient()
+	var (
+		c      = client.NewClient()
+		e      = echo.New()
+		logger = e.Logger
+	)
 
-	fmt.Println("Getting challenge")
+	logger.Print("Started")
 	challenge, err := c.GetChallenge()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
-	fmt.Println("Challenge received")
-	fmt.Println(challenge)
+	data := base64.StdEncoding.EncodeToString(challenge.ChallengeData)
+	logger.Print("Challenge received:", data)
 
 	powHeaderBuilder := usecase.NewPowHeaderBuilder()
-	challenger := usecase2.NewChallenger()
+	challenger := challenger_usecase.NewChallenger(logger)
 
 	solution := challenger.Solve(*challenge)
-	fmt.Println(fmt.Sprintf("solution: %x", solution))
+	logger.Print("Solution: ", base64.StdEncoding.EncodeToString(solution.Hash))
 
 	powHeader := powHeaderBuilder.Build(*solution)
-	fmt.Println(fmt.Sprintf("pow-header prepared: %s", powHeader))
+	logger.Print("pow-header prepared: ", powHeader)
 
 	quote, err := c.GetQuote(powHeader)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(quote)
-	fmt.Println("Finished")
-
+	logger.Print(quote)
+	logger.Print("Finished")
 }
