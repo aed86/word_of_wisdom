@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/aed86/proof_of_work/cmd"
 	"github.com/aed86/proof_of_work/internal"
 	"github.com/aed86/proof_of_work/internal/pkg/challenger/usecase"
 	pow_header_builder_usecase "github.com/aed86/proof_of_work/internal/pkg/pow_header_builder/usecase"
@@ -36,5 +37,5 @@ func main() {
 	e.GET(internal.GetQuoteEndpoint, getQuoteHandler.GetQuote)
 
 	// Start server
-	e.Logger.Fatal(e.Start(":8000"))
+	e.Logger.Fatal(e.Start(cmd.GetAddressFromEnv()))
 }

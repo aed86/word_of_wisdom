@@ -8,13 +8,13 @@ import (
 )
 
 type Client struct {
-	host   string
-	client http.Client
+	address string
+	client  http.Client
 }
 
-func NewClient() *Client {
+func NewClient(address string) *Client {
 	return &Client{
-		host: "0.0.0.0:8000", // TODO: move to env
+		address: address,
 		client: http.Client{
 			Timeout: time.Second * 10,
 		},

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/aed86/proof_of_work/cmd"
 	"github.com/aed86/proof_of_work/internal/client"
 	challenger_usecase "github.com/aed86/proof_of_work/internal/pkg/challenger/usecase"
 	"github.com/aed86/proof_of_work/internal/pkg/pow_header_builder/usecase"
@@ -14,7 +15,7 @@ import (
 
 func main() {
 	var (
-		c      = client.NewClient()
+		c      = client.NewClient(cmd.GetAddressFromEnv())
 		e      = echo.New()
 		logger = e.Logger
 	)

@@ -31,5 +31,5 @@ func (c *Client) GetChallenge() (*model.Challenge, error) {
 }
 
 func (c *Client) getChallengeUri() string {
-	return fmt.Sprintf("http://%s%s", c.host, internal.GetChallengeEndpoint)
+	return fmt.Sprintf("http://%s%s", c.address, internal.GetChallengeEndpoint)
 }

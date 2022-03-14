@@ -31,5 +31,5 @@ func (c *Client) GetQuote(powHeader string) (*model2.Quote, error) {
 }
 
 func (c *Client) getQuoteUri() string {
-	return fmt.Sprintf("http://%s%s", c.host, internal.GetQuoteEndpoint)
+	return fmt.Sprintf("http://%s%s", c.address, internal.GetQuoteEndpoint)
 }

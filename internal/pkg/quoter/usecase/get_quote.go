@@ -24,7 +24,7 @@ func (q *quoter) GetQuote() (*model.Quote, error) {
 }
 
 func getAllQuotes() ([]model.Quote, error) {
-	absPath, _ := filepath.Abs("./data/quotes.txt")
+	absPath, _ := filepath.Abs("./data/quotes.csv")
 	file, err := os.OpenFile(absPath, os.O_RDWR|os.O_CREATE, os.ModePerm)
 	if err != nil {
 		return nil, errors.OpenQuoterFileError
