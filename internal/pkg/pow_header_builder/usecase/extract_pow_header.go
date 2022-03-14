@@ -11,11 +11,11 @@ import (
 
 func (*powHeaderBuilder) Extract(powHeader string) (*model.Solution, error) {
 	parts := strings.Split(powHeader, ":")
-	if len(parts) < 4 {
+	if len(parts) < 2 {
 		return nil, fmt.Errorf("wrong header format")
 	}
 
-	timestamp, err := strconv.ParseInt(parts[3], 10, 64)
+	challenge, err := base64.StdEncoding.DecodeString(parts[0])
 	if err != nil {
 		return nil, err
 	}
@@ -25,20 +25,8 @@ func (*powHeaderBuilder) Extract(powHeader string) (*model.Solution, error) {
 		return nil, err
 	}
 
-	challenge, err := base64.StdEncoding.DecodeString(parts[0])
-	if err != nil {
-		return nil, err
-	}
-
-	leadingZeros, err := strconv.ParseInt(parts[3], 10, 64)
-	if err != nil {
-		return nil, err
-	}
-
 	return &model.Solution{
-		Challenge:    challenge,
-		Nonce:        nonce,
-		LeadingZeros: int(leadingZeros),
-		Timestamp:    timestamp,
+		Solution: challenge,
+		Nonce:    nonce,
 	}, nil
 }

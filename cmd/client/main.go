@@ -1,8 +1,10 @@
 package main
 
 import (
-	"encoding/base64"
-	"log"
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"io"
 
 	"github.com/aed86/proof_of_work/internal/client"
 	challenger_usecase "github.com/aed86/proof_of_work/internal/pkg/challenger/usecase"
@@ -17,29 +19,55 @@ func main() {
 		logger = e.Logger
 	)
 
-	logger.Print("Started")
 	challenge, err := c.GetChallenge()
 	if err != nil {
 		logger.Fatal(err)
 	}
 
-	data := base64.StdEncoding.EncodeToString(challenge.ChallengeData)
-	logger.Print("Challenge received:", data)
+	err = prettyPrint("Got challenge:", challenge)
+	if err != nil {
+		logger.Fatal(err)
+	}
 
 	powHeaderBuilder := usecase.NewPowHeaderBuilder()
 	challenger := challenger_usecase.NewChallenger(logger)
 
 	solution := challenger.Solve(*challenge)
-	logger.Print("Solution: ", base64.StdEncoding.EncodeToString(solution.Hash))
-
-	powHeader := powHeaderBuilder.Build(*solution)
-	logger.Print("pow-header prepared: ", powHeader)
-
-	quote, err := c.GetQuote(powHeader)
+	err = prettyPrint("Solution: ", solution)
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
-	logger.Print(quote)
-	logger.Print("Finished")
+	powHeader := powHeaderBuilder.Build(*solution)
+	quote, err := c.GetQuote(powHeader)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	err = prettyPrint("Random quote: ", quote)
+	if err != nil {
+		logger.Fatal(err)
+	}
+}
+
+func prettyEncode(data interface{}, out io.Writer) error {
+	enc := json.NewEncoder(out)
+	enc.SetIndent("", "    ")
+	if err := enc.Encode(data); err != nil {
+		return err
+	}
+	return nil
+}
+
+func prettyPrint(topic string, json interface{}) error {
+	var buffer bytes.Buffer
+	err := prettyEncode(json, &buffer)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(topic)
+	fmt.Println(buffer.String())
+
+	return nil
 }

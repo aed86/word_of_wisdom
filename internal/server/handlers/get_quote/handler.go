@@ -49,7 +49,7 @@ func (h *handler) GetQuote(c echo.Context) error {
 
 	err = h.challenger.Validate(*solution)
 	if err != nil {
-		return echo.NewHTTPError(http.StatusForbidden, "Challenge not solved", err)
+		return echo.NewHTTPError(http.StatusForbidden, "Solution not solved", err)
 	}
 
 	quote, err := h.quoter.GetQuote()
